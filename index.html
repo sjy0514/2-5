@@ -4,31 +4,36 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>체육대회 작전판</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@2.3.3/dist/web/static/pretendard.css" />
 <style>
   body {
     font-family: 'Pretendard', sans-serif, sans-serif;
     background: #f0f2f5;
-    margin: 0; padding: 20px;
+    margin: 0;
+    padding: 10px;
   }
   h1 {
     color: #2c3e50;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    font-size: 24px;
   }
   .board {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 15px;
   }
   .column {
     background: white;
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     width: 100%;
     max-width: 600px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-sizing: border-box;
   }
   .column h2 {
     margin-top: 0;
+    font-size: 18px;
   }
   .add-form {
     margin-top: 10px;
@@ -39,7 +44,7 @@
     margin: 5px 0;
     border-radius: 6px;
     border: 1px solid #ccc;
-    font-size: 16px;
+    font-size: 14px;
     box-sizing: border-box;
   }
   button {
@@ -59,7 +64,9 @@
     background: #fff;
     position: relative;
     width: 100%;
-    height: 400px;
+    max-width: 600px;
+    height: auto;
+    aspect-ratio: 3 / 2;
     user-select: none;
   }
   svg {
@@ -73,31 +80,32 @@
     border: 1px solid #888;
     border-radius: 4px;
     padding: 2px 6px;
-    font-size: 14px;
+    font-size: 12px;
     transform: translate(-50%, -50%);
     z-index: 20;
-    min-width: 80px;
+    min-width: 60px;
     box-sizing: border-box;
   }
   .name-label {
     position: absolute;
     background: rgba(46, 204, 113, 0.85);
     color: white;
-    padding: 2px 8px;
-    font-size: 14px;
-    border-radius: 12px;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 10px;
     white-space: nowrap;
-    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    cursor: pointer;
     transform: translate(-50%, -50%);
     z-index: 15;
   }
   .item {
     background: #ecf0f1;
     border-radius: 8px;
-    padding: 10px 40px 10px 10px;
-    margin-top: 10px;
+    padding: 8px 35px 8px 10px;
+    margin-top: 8px;
     position: relative;
     user-select: none;
+    font-size: 14px;
   }
   .delete-btn {
     position: absolute;
@@ -107,21 +115,59 @@
     background: #e74c3c;
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    padding: 1px 6px;
-    font-size: 12px;
+    padding: 1px 5px;
+    font-size: 10px;
     line-height: 1;
     user-select: none;
     transition: background-color 0.2s ease;
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .delete-btn:hover {
     background: #c0392b;
+  }
+  @media (min-width: 768px) {
+    body {
+      padding: 20px;
+    }
+    h1 {
+      font-size: 28px;
+    }
+    .board {
+      flex-direction: row;
+      gap: 20px;
+    }
+    .column {
+      padding: 20px;
+    }
+    .column h2 {
+      font-size: 20px;
+    }
+    select, textarea, button {
+      font-size: 16px;
+    }
+    .name-input {
+      font-size: 14px;
+      min-width: 80px;
+    }
+    .name-label {
+      font-size: 14px;
+      padding: 2px 8px;
+    }
+    .item {
+      padding: 10px 40px 10px 10px;
+      font-size: 16px;
+    }
+    .delete-btn {
+      font-size: 12px;
+      width: 22px;
+      height: 22px;
+    }
   }
 </style>
 </head>
@@ -168,9 +214,9 @@
 
   let currentSport = '농구';
   let svg;
-  let playerPositions = []; // {name, x, y}
+  let playerPositions = [];
   let currentInput = null;
-  let editingIndex = null; // 수정 중인 playerPositions 인덱스
+  let editingIndex = null;
 
   window.onload = () => {
     loadStrategies();
@@ -194,7 +240,6 @@
     });
   }
 
-  // 종목별 작전 추가
   function addItem(type) {
     if (type === 'strategy') {
       const title = document.getElementById('strategy-title').value;
@@ -208,7 +253,6 @@
     }
   }
 
-  // 종목별 작전 불러오기
   function loadStrategies() {
     const container = document.getElementById('strategy-list');
     container.innerHTML = '';
@@ -231,7 +275,6 @@
     });
   }
 
-  // 선수 저장
   function savePlayers() {
     if (playerPositions.length === 0) {
       alert('배치도 위에 이름을 먼저 추가해주세요.');
@@ -245,7 +288,6 @@
     loadPlayers();
   }
 
-  // 선수 리스트 불러오기 (이미지 위 이름과 완전 동기화)
   function loadPlayers() {
     const container = document.getElementById('player-list');
     container.innerHTML = '';
@@ -278,7 +320,7 @@
     if (currentInput) {
       currentInput.remove();
       currentInput = null;
-      editingIndex = null; // 수정 인덱스 초기화
+      editingIndex = null;
     }
     changeDiagram();
   }
@@ -288,13 +330,12 @@
     const existingInput = container.querySelector('.name-input');
     const existingLabels = Array.from(container.querySelectorAll('.name-label'));
 
-    // SVG만 제거하고 새로 생성
     const existingSvg = container.querySelector('svg');
     if (existingSvg) existingSvg.remove();
 
     svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '600');
-    svg.setAttribute('height', '400');
+    svg.setAttribute('viewBox', '0 0 600 400');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.style.border = '1px solid #333';
     svg.style.background = '#f0f0f0';
     container.appendChild(svg);
@@ -332,7 +373,6 @@
       return line;
     }
 
-    // 배경과 코트 그리기
     switch (currentSport) {
       case '농구':
         svg.appendChild(createRect(50, 50, 500, 300, '#f39c12', '#b9770e', 3));
@@ -365,33 +405,29 @@
         break;
     }
 
-    // 기존 이름 라벨 제거
     existingLabels.forEach(label => label.remove());
 
-    // 이름 라벨 다시 추가 및 클릭 이벤트 추가
     playerPositions.forEach((pos, index) => {
       const label = document.createElement('div');
       label.className = 'name-label';
       label.textContent = pos.name;
-      label.style.left = pos.x + 'px';
-      label.style.top = pos.y + 'px';
+      label.style.left = `${(pos.x / 600) * 100}%`;
+      label.style.top = `${(pos.y / 400) * 100}%`;
       label.onclick = () => {
-        openNameInput(pos.x, pos.y, index); // 수정 모드로 입력창 열기
+        openNameInput(pos.x, pos.y, index);
       };
       container.appendChild(label);
     });
 
-    // 기존 입력창 복원
     if (existingInput) {
       container.appendChild(existingInput);
     }
 
-    // SVG 클릭 이벤트
     svg.onclick = (e) => {
       const rect = svg.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      openNameInput(x, y); // 새 이름 추가 모드
+      const x = (e.clientX - rect.left) * (600 / rect.width);
+      const y = (e.clientY - rect.top) * (400 / rect.height);
+      openNameInput(x, y);
     };
   }
 
@@ -402,12 +438,11 @@
     currentInput.type = 'text';
     currentInput.placeholder = '이름 입력';
     currentInput.className = 'name-input';
-    currentInput.style.left = x + 'px';
-    currentInput.style.top = y + 'px';
+    currentInput.style.left = `${(x / 600) * 100}%`;
+    currentInput.style.top = `${(y / 400) * 100}%`;
     currentInput.style.position = 'absolute';
-    editingIndex = index; // 수정 중인 인덱스 저장
+    editingIndex = index;
 
-    // 수정 모드라면 기존 이름 채우기
     if (index !== null) {
       currentInput.value = playerPositions[index].name;
     }
@@ -431,13 +466,12 @@
   function saveInputName() {
     const val = currentInput.value.trim();
     if (val) {
-      const x = parseFloat(currentInput.style.left);
-      const y = parseFloat(currentInput.style.top);
+      const rect = svg.getBoundingClientRect();
+      const x = (parseFloat(currentInput.style.left) / 100) * 600;
+      const y = (parseFloat(currentInput.style.top) / 100) * 400;
       if (editingIndex !== null) {
-        // 수정 모드: 기존 항목 업데이트
         playerPositions[editingIndex] = { name: val, x, y };
       } else {
-        // 추가 모드: 새 항목 추가
         playerPositions.push({ name: val, x, y });
       }
     }
